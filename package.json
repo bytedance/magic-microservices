@@ -3,6 +3,17 @@
   "version": "1.0.1-alpha.1",
   "moduleName": "magic",
   "description": "Micro frontends made easy.😘",
+  "keywords": [
+    "magic",
+    "microfrontends",
+    "microservices",
+    "frontend",
+    "application",
+    "framework",
+    "react",
+    "angular",
+    "vue"
+  ],
   "homepage": "https://github.com/bytedance/magic-microservices",
   "bugs": "https://github.com/bytedance/magic-microservices/issues",
   "repository": {
