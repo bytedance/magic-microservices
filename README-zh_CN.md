@@ -2,7 +2,7 @@
 
 让前端的一切皆可“微”（一个函数解决微前端）
 
-![Travis (.org)](https://img.shields.io/travis/bytedance/magic-microservices.svg) [![codecov](https://codecov.io/gh/bytedance/magic-microservices/branch/main/graph/badge.svg?token=FmpE8fWxEu)](https://codecov.io/gh/bytedance/magic-microservices) [![npm](https://img.shields.io/npm/v/@magic-microservices/magic)](https://www.npmjs.com/package/@magic-microservices/magic)  [![GitHub](https://img.shields.io/github/license/bytedance/magic-microservices?color=blue)](https://github.com/bytedance/magic-microservices/blob/main/LICENSE)  
+[![Build Status](https://www.travis-ci.org/bytedance/magic-microservices.svg?branch=main)](https://www.travis-ci.org/bytedance/magic-microservices) [![codecov](https://codecov.io/gh/bytedance/magic-microservices/branch/main/graph/badge.svg?token=FmpE8fWxEu)](https://codecov.io/gh/bytedance/magic-microservices) [![npm](https://img.shields.io/npm/v/@magic-microservices/magic)](https://www.npmjs.com/package/@magic-microservices/magic)  [![GitHub](https://img.shields.io/github/license/bytedance/magic-microservices?color=blue)](https://github.com/bytedance/magic-microservices/blob/main/LICENSE)  
 
 [English](./README.md) | 简体中文
 
