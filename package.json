@@ -3,6 +3,12 @@
   "version": "1.0.1-alpha.0",
   "moduleName": "magic",
   "description": "Micro frontends made easy.😘",
+  "homepage": "https://github.com/bytedance/magic-microservices",
+  "bugs": "https://github.com/bytedance/magic-microservices/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bytedance/magic-microservices"
+  },
   "author": {
     "name": "Ranjay Zheng",
     "email": "magic-microservices@bytedance.com"
