@@ -1,0 +1,104 @@
+{
+  "name": "@magic-microservices/magic",
+  "version": "1.0.1-alpha.0",
+  "moduleName": "magic",
+  "description": "Micro frontends made easy.😘",
+  "author": {
+    "name": "Ranjay Zheng",
+    "email": "magic-microservices@bytedance.com"
+  },
+  "files": [
+    "dist"
+  ],
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "sideEffects": false,
+  "scripts": {
+    "test": "jest --coverage --detectOpenHandles --forceExit",
+    "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand --detectOpenHandles --forceExit",
+    "codecov": "codecov",
+    "lint": "eslint --ext .ts,.js src",
+    "lint:fix": "npm run lint -- --fix",
+    "check-types": "ttsc",
+    "check-types:watch": "ttsc --watch",
+    "prepublishOnly": "npm run lint:fix && npm run build",
+    "watch:cjs": "cross-env TARGET=web-cjs-dev rollup -w -c build/config.js",
+    "watch:esm": "cross-env TARGET=web-esm-dev rollup -w -c build/config.js",
+    "watch:browser": "cross-env TARGET=web-esm-browser-dev rollup -w -c build/config.js",
+    "watch:umd": "cross-env TARGET=web-umd-dev rollup -w -c build/config.js",
+    "watch:system": "cross-env TARGET=web-system-dev rollup -w -c build/config.js",
+    "watch": "npm-run-all --parallel watch:*",
+    "serve": "http-server ./dist -p 3003 --cors",
+    "dev": "npm-run-all --parallel watch serve",
+    "build:cjs:dev": "cross-env TARGET=web-cjs-dev rollup -c build/config.js",
+    "build:esm:dev": "cross-env TARGET=web-esm-dev rollup -c build/config.js",
+    "build:browser:dev": "cross-env TARGET=web-esm-browser-dev rollup -c build/config.js",
+    "build:umd:dev": "cross-env TARGET=web-umd-dev rollup -c build/config.js",
+    "build:system:dev": "cross-env TARGET=web-system-dev rollup -c build/config.js",
+    "build:esm:prod": "cross-env TARGET=web-esm-prod rollup -c build/config.js",
+    "build:browser:prod": "cross-env TARGET=web-esm-browser-prod rollup -c build/config.js",
+    "build:umd:prod": "cross-env TARGET=web-umd-prod rollup -c build/config.js",
+    "build:system:prod": "cross-env TARGET=web-system-prod rollup -c build/config.js",
+    "build": "rm -rf dist && npm-run-all --parallel check-types build:*:*"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "commit-msg": "validate-commit-msg"
+    }
+  },
+  "lint-staged": {
+    "*.{js,ts}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.9.6",
+    "@babel/plugin-proposal-class-properties": "^7.10.4",
+    "@babel/plugin-transform-runtime": "^7.12.0",
+    "@babel/preset-env": "^7.9.6",
+    "@babel/preset-typescript": "^7.10.4",
+    "@rollup/plugin-alias": "^3.1.1",
+    "@rollup/plugin-babel": "^5.0.0",
+    "@rollup/plugin-commonjs": "^11.1.0",
+    "@rollup/plugin-node-resolve": "^7.1.3",
+    "@rollup/plugin-replace": "^2.3.2",
+    "@types/jest": "^26.0.15",
+    "@typescript-eslint/eslint-plugin": "^3.8.0",
+    "@typescript-eslint/parser": "^3.8.0",
+    "babel-eslint": "^10.1.0",
+    "codecov": "^3.8.1",
+    "cross-env": "^7.0.2",
+    "electron": "^10.1.4",
+    "eslint": "^7.6.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-babel": "^5.3.1",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "http-server": "^0.12.3",
+    "husky": "^4.2.5",
+    "jest": "^26.6.0",
+    "jest-electron": "^0.1.11",
+    "lint-staged": "^10.2.11",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.0.5",
+    "rollup": "^2.7.6",
+    "rollup-plugin-external-globals": "^0.5.0",
+    "rollup-plugin-terser": "^6.1.0",
+    "ts-jest": "^26.4.1",
+    "ttypescript": "^1.5.10",
+    "typescript": "^3.9.7",
+    "typescript-transform-paths": "^2.0.0",
+    "validate-commit-msg": "^2.14.0"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.12.0"
+  }
+}
