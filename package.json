@@ -1,6 +1,6 @@
 {
   "name": "@magic-microservices/magic",
-  "version": "1.0.1-alpha.0",
+  "version": "1.0.1-alpha.1",
   "moduleName": "magic",
   "description": "Micro frontends made easy.😘",
   "homepage": "https://github.com/bytedance/magic-microservices",
