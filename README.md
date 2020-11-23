@@ -280,7 +280,7 @@ Of course, similar to UMD, you can also use the ES Module remote package directl
 
 ##### SystemJS
 
-If you are using a package registered with [SystemJS](https://github.com/systemjs/systemjs), then everything becomes eaiser:
+If you are using a package registered with [SystemJS](https://github.com/systemjs/systemjs), then everything becomes easier:
 
 ```javascript  
 magic('custom-component', System.import('https://somewhere/to/your/module/index.system.js'))
