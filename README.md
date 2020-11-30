@@ -154,7 +154,7 @@ interface Module<Props extends Record<string, unknown>> {
 You can execute some logic which is required by micro application before DOM mounted, such as pulling and initializing i18n resource.  
 
 ###### FirstUpdated
-Called will be triggeed when initializing every single prop field from DOM attributes before micro-application mount to the DOM. References can be found on Web Components' attributeChangedCallback API.  
+Called will be triggered when initializing every single prop field from DOM attributes before micro-application mount to the DOM. References can be found on Web Components' attributeChangedCallback API.  
 
 ###### Mount  
 This function is used to mount your application. Similar to react-dom's render function, this function takes a container element and the props you want to pass to your app, and renders your application into the container. If you are familiar with Web Components, you may find this function do the same thing as the connectedCallback API.  
