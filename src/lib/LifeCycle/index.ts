@@ -123,6 +123,7 @@ export default class LifeCycle<Props extends Record<string, unknown>> {
     const { options, contentWrapper, htmlTagFragment, module } = this;
     return class CustomElement extends CustomElementType {
       public attributesObj: Props = {} as Props;
+      public webComponentsIns: ShadowRoot | HTMLElement;
       // for attributeChangedCallback
       static get observedAttributes() {
         return Object.keys(options.propTypes || {});
@@ -130,16 +131,14 @@ export default class LifeCycle<Props extends Record<string, unknown>> {
 
       constructor() {
         super();
-        if (options.shadow) {
-          this.shadow = this.attachShadow({ mode: 'open' });
-          this.shadow.appendChild(htmlTagFragment);
-        } else {
-          this.appendChild(htmlTagFragment);
-        }
+        this.webComponentsIns = options.shadow ? this.attachShadow({ mode: 'open' }) : this;
         module.bootstrap && module.bootstrap();
       }
 
       connectedCallback() {
+        if (!this.webComponentsIns.hasChildNodes()) {
+          this.webComponentsIns.appendChild(htmlTagFragment);
+        }
         module.mount(contentWrapper, this.attributesObj);
       }
 
