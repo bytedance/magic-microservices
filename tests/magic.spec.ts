@@ -40,6 +40,7 @@ describe('test magic', () => {
     buttonElement.setAttribute('owner', String(mockProps.owner));
     buttonElement.setAttribute('guest', mockProps.guest);
     buttonElement.setAttribute('callback', useProps(mockProps.callback));
+
     await magic<MockProps>(
       componentTag,
       {
@@ -90,6 +91,7 @@ describe('test magic', () => {
         ],
       },
     );
+
     const magicDom = getDom(componentTag);
     const magicWrapper = magicDom.querySelector('#magic-wrapper');
     const scriptTag = magicDom.querySelector('script');
@@ -105,14 +107,24 @@ describe('test magic', () => {
     document.body.getElementsByTagName(componentTag)[0].remove();
   });
 
-  test('test isModuleRegistered', () => {
-    magic(componentTag, {
-      mount: (container: HTMLElement): void => {
-        container.innerHTML = componentTag;
-      },
-    });
+  test('test isModuleRegistered', async () => {
     expect(isModuleRegistered(componentTag)).toBeTruthy();
     expect(isModuleRegistered(shadowComponentTag)).toBeFalsy();
+  });
+
+  // https://stackoverflow.com/questions/40181683/failed-to-execute-createelement-on-document-the-result-must-not-have-childr
+  test('test createElement', async () => {
+    const createElementTest = 'create-element-test';
+    await magic(createElementTest, {
+      mount: (container: HTMLElement): void => {
+        container.innerHTML = createElementTest;
+      },
+    });
+    const createElementTestEle = document.createElement(createElementTest);
+    document.body.appendChild(createElementTestEle);
+    const magicDom = getDom(createElementTest);
+    const magicWrapper = magicDom.querySelector('#magic-wrapper');
+    expect(magicWrapper?.innerHTML).toBe(createElementTest);
   });
 
   test('test shadow DOM', async () => {
