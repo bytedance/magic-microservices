@@ -21,11 +21,11 @@ const mockProps = {
 
 type MockProps = typeof mockProps;
 
-describe('test magic', () => {
-  function getDom(tagName: string): Element {
-    return document.body.getElementsByTagName(tagName)[0];
-  }
+function getDomByTagName(tagName: string): Element {
+  return document.body.getElementsByTagName(tagName)[0];
+}
 
+describe('test magic', () => {
   test('test magic core', async (done) => {
     const testCustomHtmlTag = 'test-custom-tag';
     const testScriptLink = 'test-script';
@@ -92,7 +92,7 @@ describe('test magic', () => {
       },
     );
 
-    const magicDom = getDom(componentTag);
+    const magicDom = getDomByTagName(componentTag);
     const magicWrapper = magicDom.querySelector('#magic-wrapper');
     const scriptTag = magicDom.querySelector('script');
     const linkTag = magicDom.querySelector('link');
@@ -115,14 +115,28 @@ describe('test magic', () => {
   // https://stackoverflow.com/questions/40181683/failed-to-execute-createelement-on-document-the-result-must-not-have-childr
   test('test createElement', async () => {
     const createElementTest = 'create-element-test';
+    const testElementId = 'create-element-test' + 1;
     await magic(createElementTest, {
       mount: (container: HTMLElement): void => {
         container.innerHTML = createElementTest;
       },
     });
     const createElementTestEle = document.createElement(createElementTest);
+    createElementTestEle.setAttribute('id', testElementId);
     document.body.appendChild(createElementTestEle);
-    const magicDom = getDom(createElementTest);
+    const magicDom = document.body.getElementsByTagName(createElementTest)[0];
+    const magicWrapper = magicDom.querySelector('#magic-wrapper');
+    expect(magicWrapper?.innerHTML).toBe(createElementTest);
+  });
+
+  test('muti createElement', () => {
+    const createElementTest = 'create-element-test';
+    const testElementId = 'create-element-test' + 2;
+    const createElementTestEle = document.createElement(createElementTest);
+    createElementTestEle.setAttribute('id', testElementId);
+    document.body.appendChild(createElementTestEle);
+    const magicDom = document.body.getElementsByTagName(createElementTest)[1];
+    // const magicDom = getDomById(createElementTest) as Element;
     const magicWrapper = magicDom.querySelector('#magic-wrapper');
     expect(magicWrapper?.innerHTML).toBe(createElementTest);
   });

@@ -53,13 +53,16 @@ export type LifeCycleHookType<Props extends Record<string, unknown>> = Record<
   Hook<LifeCycle<Props>, LifeCycle<Props>>
 >;
 
+interface IBuildFragmentOutput {
+  htmlTagFragment: DocumentFragment;
+  contentWrapper: HTMLElement;
+}
+
 export default class LifeCycle<Props extends Record<string, unknown>> {
   public magicInput: MagicInput<Props>;
   public name: string;
   public options: MagicOptions<Props>;
   public module: Module<Props>;
-  public contentWrapper: HTMLElement;
-  public htmlTagFragment: DocumentFragment;
   public customElement: typeof CustomElementType;
   public hooks: LifeCycleHookType<Props> = {} as LifeCycleHookType<Props>;
   public componentBuilder = (): void => customElements.define(this.name, this.customElement);
@@ -77,7 +80,7 @@ export default class LifeCycle<Props extends Record<string, unknown>> {
 
   public run = (): Promise<unknown> => {
     const runHook = new Hook();
-    runHook.tap([this.generateModule, this.formatAliasTagTypes, this.buildFragment, this.defineCustomElement]);
+    runHook.tap([this.generateModule, this.formatAliasTagTypes, this.defineCustomElement]);
     return runHook.call();
   };
 
@@ -97,7 +100,7 @@ export default class LifeCycle<Props extends Record<string, unknown>> {
     return this.hooks.alterHTMLTags.call(this) as Promise<LifeCycle<Props>>;
   };
 
-  private buildFragment = (): void => {
+  private buildFragment = (): IBuildFragmentOutput => {
     const { options } = this;
     const renderHtmlTags = (options.htmlTags || []).concat(
       ...Object.values(AliasTagTypes).map((tagType) => options[tagType] as HtmlTagObject[]),
@@ -109,8 +112,10 @@ export default class LifeCycle<Props extends Record<string, unknown>> {
       }),
     );
     htmlTagFragment.appendChild(contentWrapper);
-    this.htmlTagFragment = htmlTagFragment;
-    this.contentWrapper = contentWrapper;
+    return {
+      htmlTagFragment,
+      contentWrapper,
+    };
   };
 
   private defineCustomElement = (): Promise<void> => {
@@ -120,10 +125,12 @@ export default class LifeCycle<Props extends Record<string, unknown>> {
 
   private generateCustomElement = (): typeof CustomElementType => {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const { options, contentWrapper, htmlTagFragment, module } = this;
+    const { options, module, buildFragment } = this;
     return class CustomElement extends CustomElementType {
       public attributesObj: Props = {} as Props;
       public webComponentsIns: ShadowRoot | HTMLElement;
+      public contentWrapper: HTMLElement;
+      public htmlTagFragment: DocumentFragment;
       // for attributeChangedCallback
       static get observedAttributes() {
         return Object.keys(options.propTypes || {});
@@ -136,10 +143,11 @@ export default class LifeCycle<Props extends Record<string, unknown>> {
       }
 
       connectedCallback() {
-        if (!this.webComponentsIns.hasChildNodes()) {
-          this.webComponentsIns.appendChild(htmlTagFragment);
-        }
-        module.mount(contentWrapper, this.attributesObj);
+        const { contentWrapper, htmlTagFragment } = buildFragment();
+        this.contentWrapper = contentWrapper;
+        this.htmlTagFragment = htmlTagFragment;
+        this.webComponentsIns.appendChild(this.htmlTagFragment);
+        module.mount(this.contentWrapper, this.attributesObj);
       }
 
       disconnectedCallback() {
@@ -155,7 +163,7 @@ export default class LifeCycle<Props extends Record<string, unknown>> {
         (attributeName in oldAttributesObj ? module.updated : module.firstUpdated)?.(
           attributeName,
           propsValue,
-          contentWrapper,
+          this.contentWrapper,
           this.attributesObj,
         );
       }
