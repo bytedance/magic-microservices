@@ -1,6 +1,6 @@
 {
   "name": "@magic-microservices/magic",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "moduleName": "magic",
   "description": "Micro frontends made easy.😘",
   "keywords": [
