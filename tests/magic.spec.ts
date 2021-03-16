@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import magic, { useProps, isModuleRegistered } from '@/index';
+import magic, { useProps, isModuleRegistered, MagicInstanceType } from '@/index';
 import LifeCycle from '@/lib/LifeCycle';
 
 const componentTag = 'my-component';
@@ -41,11 +41,13 @@ describe('test magic', () => {
     buttonElement.setAttribute('guest', mockProps.guest);
     buttonElement.setAttribute('callback', useProps(mockProps.callback));
 
+    let magicInstance: MagicInstanceType;
+
     await magic<MockProps>(
       componentTag,
       {
         bootstrap: mockFunction,
-        mount: (container, props): void => {
+        mount: (container, props, instance): void => {
           container.innerHTML = componentTag;
           expect(props.name).toBe(mockProps.name);
           expect(props.age).toBe(mockProps.age);
@@ -53,14 +55,18 @@ describe('test magic', () => {
           expect(props.guest).toBeTruthy();
           expect(props.callback).toBe(mockProps.callback);
           expect(props.callback(1, 2)).toBe(3);
+          magicInstance = instance;
         },
-        updated: (attributeName, propsValue, _container, props): void => {
+        updated: (attributeName, propsValue, _container, props, instance): void => {
           expect(attributeName).toBe('age');
           expect(propsValue).toBe(21);
           expect(props.age).toBe(21);
+          expect(instance).toBe(magicInstance);
         },
-        unmount: () => {
+        unmount: (instance) => {
           expect(mockFunction).toHaveBeenCalledTimes(1);
+          expect(mockFunction).toHaveBeenCalledWith(magicInstance);
+          expect(instance).toBe(magicInstance);
           done();
         },
       },
