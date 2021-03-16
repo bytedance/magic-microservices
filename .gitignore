@@ -58,4 +58,7 @@ typings/
 # dotenv environment variables file
 .env
 
+# ide
+.idea/
+
 dist/
