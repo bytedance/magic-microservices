@@ -123,7 +123,7 @@ export default class LifeCycle<Props extends Record<string, unknown>> {
     return this.hooks.beforeElementDefinition.call(this).then(this.componentBuilder);
   };
 
-  private generateCustomElement = (): typeof CustomElementType => {
+  private generateCustomElement = () => {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const { options, module, buildFragment } = this;
     return class CustomElement extends CustomElementType {
@@ -139,7 +139,7 @@ export default class LifeCycle<Props extends Record<string, unknown>> {
       constructor() {
         super();
         this.webComponentsIns = options.shadow ? this.attachShadow({ mode: 'open' }) : this;
-        module.bootstrap && module.bootstrap();
+        module.bootstrap && module.bootstrap(this);
       }
 
       connectedCallback() {
@@ -147,11 +147,11 @@ export default class LifeCycle<Props extends Record<string, unknown>> {
         this.contentWrapper = contentWrapper;
         this.htmlTagFragment = htmlTagFragment;
         this.webComponentsIns.appendChild(this.htmlTagFragment);
-        module.mount(this.contentWrapper, this.attributesObj);
+        module.mount(this.contentWrapper, this.attributesObj, this);
       }
 
       disconnectedCallback() {
-        module.unmount && module.unmount();
+        module.unmount && module.unmount(this);
       }
 
       attributeChangedCallback(attributeName: keyof Props, _oldValue: string, newValue: string) {
@@ -165,6 +165,7 @@ export default class LifeCycle<Props extends Record<string, unknown>> {
           propsValue,
           this.contentWrapper,
           this.attributesObj,
+          this,
         );
       }
     };

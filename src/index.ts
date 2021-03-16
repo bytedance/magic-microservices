@@ -8,12 +8,28 @@ import { HtmlTagObject } from '@/utils/htmlTag';
 import heap, { PropTypesMap, ValueOf } from '@/lib/Heap';
 import LifeCycle, { AliasTagTypes, MagicPluginTypes } from '@/lib/LifeCycle';
 
+export type MagicInstanceType<T extends Record<string, unknown> = Record<string, unknown>> = InstanceType<
+  ReturnType<LifeCycle<T>['generateCustomElement']>
+>;
+
 export interface Module<Props extends Record<string, unknown>> {
-  bootstrap?: () => void;
-  mount: (container: Element, props: Props) => void;
-  firstUpdated?: (attributeName: keyof Props, propsValue: ValueOf<Props>, container: Element, props: Props) => void;
-  updated?: (attributeName: keyof Props, propsValue: ValueOf<Props>, container: Element, props: Props) => void;
-  unmount?: () => void;
+  bootstrap?: (magicInstance: MagicInstanceType<Props>) => void;
+  mount: (container: Element, props: Props, magicInstance: MagicInstanceType<Props>) => void;
+  firstUpdated?: (
+    attributeName: keyof Props,
+    propsValue: ValueOf<Props>,
+    container: Element,
+    props: Props,
+    magicInstance: MagicInstanceType<Props>,
+  ) => void;
+  updated?: (
+    attributeName: keyof Props,
+    propsValue: ValueOf<Props>,
+    container: Element,
+    props: Props,
+    magicInstance: MagicInstanceType<Props>,
+  ) => void;
+  unmount?: (magicInstance: MagicInstanceType<Props>) => void;
 }
 
 export type ModuleType<Props extends Record<string, unknown>> =
