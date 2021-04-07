@@ -24,7 +24,7 @@ export enum MagicHooks {
 
 const hooks = Object.values(MagicHooks);
 
-export interface MagicPluginTypes<Props extends Record<string, unknown>> {
+export interface MagicPluginTypes<Props extends {} = Record<string, unknown>> {
   apply: (lifeCycle: LifeCycle<Props>) => void;
 }
 
@@ -33,7 +33,7 @@ export enum AliasTagTypes {
   styles = 'styles',
 }
 
-export interface MagicInput<Props extends Record<string, unknown>> {
+export interface MagicInput<Props extends {} = Record<string, unknown>> {
   name: string;
   module: ModuleType<Props>;
   options: MagicOptions<Props>;
@@ -48,7 +48,7 @@ export interface AttributeUpdateConfigType {
   newValue: unknown;
 }
 
-export type LifeCycleHookType<Props extends Record<string, unknown>> = Record<
+export type LifeCycleHookType<Props extends {} = Record<string, unknown>> = Record<
   MagicHooks,
   Hook<LifeCycle<Props>, LifeCycle<Props>>
 >;
@@ -58,7 +58,7 @@ interface IBuildFragmentOutput {
   contentWrapper: HTMLElement;
 }
 
-export default class LifeCycle<Props extends Record<string, unknown>> {
+export default class LifeCycle<Props extends {} = Record<string, unknown>> {
   public magicInput: MagicInput<Props>;
   public name: string;
   public options: MagicOptions<Props>;

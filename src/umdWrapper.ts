@@ -6,7 +6,7 @@
  */
 import magic, { useProps, isModuleRegistered, ModuleType, MagicOptions } from './index';
 
-export interface MagicModule<Props extends Record<string, unknown>> {
+export interface MagicModule<Props extends {} = Record<string, unknown>> {
   (name: string, module: ModuleType<Props>, options: MagicOptions<Props>): void;
   useProps: (value: unknown) => string;
   isModuleRegistered: (name: string) => boolean;

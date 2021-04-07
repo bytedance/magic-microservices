@@ -38,7 +38,7 @@
     "lint": "eslint --ext .ts,.js src",
     "lint:fix": "npm run lint -- --fix",
     "check-types": "ttsc",
-    "check-types:watch": "ttsc --watch",
+    "watch:check-types": "ttsc --watch",
     "prepublishOnly": "npm run lint:fix && npm run build",
     "watch:cjs": "cross-env TARGET=web-cjs-dev rollup -w -c build/config.js",
     "watch:esm": "cross-env TARGET=web-esm-dev rollup -w -c build/config.js",
