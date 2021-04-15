@@ -159,6 +159,7 @@ export default class LifeCycle<Props extends {} = Record<string, unknown>> {
           ...this.attributesObj,
         };
         const propsValue = heap.getPropsValue<Props>(attributeName, newValue, options.propTypes);
+        const prevValue = this.attributesObj[attributeName];
         this.attributesObj[attributeName] = propsValue;
         (attributeName in oldAttributesObj ? module.updated : module.firstUpdated)?.(
           attributeName,
@@ -166,6 +167,7 @@ export default class LifeCycle<Props extends {} = Record<string, unknown>> {
           this.contentWrapper,
           this.attributesObj,
           this,
+          prevValue,
         );
       }
     };
