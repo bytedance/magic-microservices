@@ -18,9 +18,9 @@ declare global {
 
 type PropTypes = typeof Number | typeof Boolean | typeof String | typeof Array | typeof Function | typeof Object;
 
-export type PropTypesMap<Props extends Record<string, unknown>> = Record<keyof Props, PropTypes>;
+export type PropTypesMap<Props extends {} = Record<string, unknown>> = Record<keyof Props, PropTypes>;
 
-export type ValueOf<Props> = Props[keyof Props]
+export type ValueOf<Props> = Props[keyof Props];
 
 class Heap {
   dataMap: DataMapType = {};
@@ -44,18 +44,18 @@ class Heap {
     return propId;
   };
 
-  getPropsValue = <Props extends Record<string, unknown>>(
+  getPropsValue = <Props extends {} = Record<string, unknown>>(
     name: keyof Props,
     value: string,
     propTypes: PropTypesMap<Props> = {} as PropTypesMap<Props>,
   ): ValueOf<Props> => {
     if (propTypes[name] === Boolean) {
       if (value === 'false') {
-        return false as ValueOf<Props>;
+        return (false as unknown) as ValueOf<Props>;
       }
-      return true as ValueOf<Props>;
+      return (true as unknown) as ValueOf<Props>;
     } else if (propTypes[name] === Number) {
-      return Number(value) as ValueOf<Props>;
+      return (Number(value) as unknown) as ValueOf<Props>;
     }
     if (this.dataMap[value]) {
       // 放在堆中的引用类型数据
@@ -64,7 +64,7 @@ class Heap {
       delete this.dataMap[value];
       return heapValue as ValueOf<Props>;
     }
-    return value as ValueOf<Props>;
+    return (value as unknown) as ValueOf<Props>;
   };
 }
 

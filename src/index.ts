@@ -8,15 +8,34 @@ import { HtmlTagObject } from '@/utils/htmlTag';
 import heap, { PropTypesMap, ValueOf } from '@/lib/Heap';
 import LifeCycle, { AliasTagTypes, MagicPluginTypes } from '@/lib/LifeCycle';
 
-export interface Module<Props extends Record<string, unknown>> {
-  bootstrap?: () => void;
-  mount: (container: Element, props: Props) => void;
-  firstUpdated?: (attributeName: keyof Props, propsValue: ValueOf<Props>, container: Element, props: Props) => void;
-  updated?: (attributeName: keyof Props, propsValue: ValueOf<Props>, container: Element, props: Props) => void;
-  unmount?: () => void;
+export type { LifeCycle };
+
+export type MagicInstanceType<T extends {} = Record<string, unknown>> = InstanceType<
+  ReturnType<LifeCycle<T>['generateCustomElement']>
+>;
+
+export interface Module<Props extends {} = Record<string, unknown>> {
+  bootstrap?: (magicInstance: MagicInstanceType<Props>) => void;
+  mount: (container: Element, props: Props, magicInstance: MagicInstanceType<Props>) => void;
+  firstUpdated?: (
+    attributeName: keyof Props,
+    propsValue: ValueOf<Props>,
+    container: Element,
+    props: Props,
+    magicInstance: MagicInstanceType<Props>,
+  ) => void;
+  updated?: (
+    attributeName: keyof Props,
+    propsValue: ValueOf<Props>,
+    container: Element,
+    props: Props,
+    magicInstance: MagicInstanceType<Props>,
+    prevValue: ValueOf<Props>,
+  ) => void;
+  unmount?: (magicInstance: MagicInstanceType<Props>) => void;
 }
 
-export type ModuleType<Props extends Record<string, unknown>> =
+export type ModuleType<Props extends {} = Record<string, unknown>> =
   | Module<Props>
   | Promise<Module<Props>>
   | ((name: string, options: MagicOptions<Props>) => Promise<Module<Props>>);
@@ -25,14 +44,14 @@ export type AliasTagTypesOptions = {
   [key in AliasTagTypes]?: (HtmlTagObject | string)[];
 };
 
-export interface MagicOptions<Props extends Record<string, unknown>> extends AliasTagTypesOptions {
+export interface MagicOptions<Props extends {} = Record<string, unknown>> extends AliasTagTypesOptions {
   htmlTags?: HtmlTagObject[];
   propTypes?: PropTypesMap<Props>;
   shadow?: boolean;
   plugins?: MagicPluginTypes<Props>[];
 }
 
-function magic<Props extends Record<string, unknown>>(
+function magic<Props extends {} = Record<string, unknown>>(
   name: string,
   module: ModuleType<Props>,
   options: MagicOptions<Props> = {},

@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import magic, { useProps, isModuleRegistered } from '@/index';
+import magic, { useProps, isModuleRegistered, MagicInstanceType } from '@/index';
 import LifeCycle from '@/lib/LifeCycle';
 
 const componentTag = 'my-component';
@@ -21,11 +21,11 @@ const mockProps = {
 
 type MockProps = typeof mockProps;
 
-describe('test magic', () => {
-  function getDom(tagName: string): Element {
-    return document.body.getElementsByTagName(tagName)[0];
-  }
+function getDomByTagName(tagName: string): Element {
+  return document.body.getElementsByTagName(tagName)[0];
+}
 
+describe('test magic', () => {
   test('test magic core', async (done) => {
     const testCustomHtmlTag = 'test-custom-tag';
     const testScriptLink = 'test-script';
@@ -40,11 +40,14 @@ describe('test magic', () => {
     buttonElement.setAttribute('owner', String(mockProps.owner));
     buttonElement.setAttribute('guest', mockProps.guest);
     buttonElement.setAttribute('callback', useProps(mockProps.callback));
+
+    let magicInstance: MagicInstanceType;
+
     await magic<MockProps>(
       componentTag,
       {
         bootstrap: mockFunction,
-        mount: (container, props): void => {
+        mount: (container, props, instance): void => {
           container.innerHTML = componentTag;
           expect(props.name).toBe(mockProps.name);
           expect(props.age).toBe(mockProps.age);
@@ -52,14 +55,18 @@ describe('test magic', () => {
           expect(props.guest).toBeTruthy();
           expect(props.callback).toBe(mockProps.callback);
           expect(props.callback(1, 2)).toBe(3);
+          magicInstance = instance;
         },
-        updated: (attributeName, propsValue, _container, props): void => {
+        updated: (attributeName, propsValue, _container, props, instance): void => {
           expect(attributeName).toBe('age');
           expect(propsValue).toBe(21);
           expect(props.age).toBe(21);
+          expect(instance).toBe(magicInstance);
         },
-        unmount: () => {
+        unmount: (instance) => {
           expect(mockFunction).toHaveBeenCalledTimes(1);
+          expect(mockFunction).toHaveBeenCalledWith(magicInstance);
+          expect(instance).toBe(magicInstance);
           done();
         },
       },
@@ -90,7 +97,8 @@ describe('test magic', () => {
         ],
       },
     );
-    const magicDom = getDom(componentTag);
+
+    const magicDom = getDomByTagName(componentTag);
     const magicWrapper = magicDom.querySelector('#magic-wrapper');
     const scriptTag = magicDom.querySelector('script');
     const linkTag = magicDom.querySelector('link');
@@ -105,14 +113,38 @@ describe('test magic', () => {
     document.body.getElementsByTagName(componentTag)[0].remove();
   });
 
-  test('test isModuleRegistered', () => {
-    magic(componentTag, {
-      mount: (container: HTMLElement): void => {
-        container.innerHTML = componentTag;
-      },
-    });
+  test('test isModuleRegistered', async () => {
     expect(isModuleRegistered(componentTag)).toBeTruthy();
     expect(isModuleRegistered(shadowComponentTag)).toBeFalsy();
+  });
+
+  // https://stackoverflow.com/questions/40181683/failed-to-execute-createelement-on-document-the-result-must-not-have-childr
+  test('test createElement', async () => {
+    const createElementTest = 'create-element-test';
+    const testElementId = 'create-element-test' + 1;
+    await magic(createElementTest, {
+      mount: (container: HTMLElement): void => {
+        container.innerHTML = createElementTest;
+      },
+    });
+    const createElementTestEle = document.createElement(createElementTest);
+    createElementTestEle.setAttribute('id', testElementId);
+    document.body.appendChild(createElementTestEle);
+    const magicDom = document.body.getElementsByTagName(createElementTest)[0];
+    const magicWrapper = magicDom.querySelector('#magic-wrapper');
+    expect(magicWrapper?.innerHTML).toBe(createElementTest);
+  });
+
+  test('muti createElement', () => {
+    const createElementTest = 'create-element-test';
+    const testElementId = 'create-element-test' + 2;
+    const createElementTestEle = document.createElement(createElementTest);
+    createElementTestEle.setAttribute('id', testElementId);
+    document.body.appendChild(createElementTestEle);
+    const magicDom = document.body.getElementsByTagName(createElementTest)[1];
+    // const magicDom = getDomById(createElementTest) as Element;
+    const magicWrapper = magicDom.querySelector('#magic-wrapper');
+    expect(magicWrapper?.innerHTML).toBe(createElementTest);
   });
 
   test('test shadow DOM', async () => {

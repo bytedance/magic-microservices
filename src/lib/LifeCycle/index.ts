@@ -24,7 +24,7 @@ export enum MagicHooks {
 
 const hooks = Object.values(MagicHooks);
 
-export interface MagicPluginTypes<Props extends Record<string, unknown>> {
+export interface MagicPluginTypes<Props extends {} = Record<string, unknown>> {
   apply: (lifeCycle: LifeCycle<Props>) => void;
 }
 
@@ -33,7 +33,7 @@ export enum AliasTagTypes {
   styles = 'styles',
 }
 
-export interface MagicInput<Props extends Record<string, unknown>> {
+export interface MagicInput<Props extends {} = Record<string, unknown>> {
   name: string;
   module: ModuleType<Props>;
   options: MagicOptions<Props>;
@@ -48,18 +48,21 @@ export interface AttributeUpdateConfigType {
   newValue: unknown;
 }
 
-export type LifeCycleHookType<Props extends Record<string, unknown>> = Record<
+export type LifeCycleHookType<Props extends {} = Record<string, unknown>> = Record<
   MagicHooks,
   Hook<LifeCycle<Props>, LifeCycle<Props>>
 >;
 
-export default class LifeCycle<Props extends Record<string, unknown>> {
+interface IBuildFragmentOutput {
+  htmlTagFragment: DocumentFragment;
+  contentWrapper: HTMLElement;
+}
+
+export default class LifeCycle<Props extends {} = Record<string, unknown>> {
   public magicInput: MagicInput<Props>;
   public name: string;
   public options: MagicOptions<Props>;
   public module: Module<Props>;
-  public contentWrapper: HTMLElement;
-  public htmlTagFragment: DocumentFragment;
   public customElement: typeof CustomElementType;
   public hooks: LifeCycleHookType<Props> = {} as LifeCycleHookType<Props>;
   public componentBuilder = (): void => customElements.define(this.name, this.customElement);
@@ -77,7 +80,7 @@ export default class LifeCycle<Props extends Record<string, unknown>> {
 
   public run = (): Promise<unknown> => {
     const runHook = new Hook();
-    runHook.tap([this.generateModule, this.formatAliasTagTypes, this.buildFragment, this.defineCustomElement]);
+    runHook.tap([this.generateModule, this.formatAliasTagTypes, this.defineCustomElement]);
     return runHook.call();
   };
 
@@ -97,7 +100,7 @@ export default class LifeCycle<Props extends Record<string, unknown>> {
     return this.hooks.alterHTMLTags.call(this) as Promise<LifeCycle<Props>>;
   };
 
-  private buildFragment = (): void => {
+  private buildFragment = (): IBuildFragmentOutput => {
     const { options } = this;
     const renderHtmlTags = (options.htmlTags || []).concat(
       ...Object.values(AliasTagTypes).map((tagType) => options[tagType] as HtmlTagObject[]),
@@ -110,8 +113,10 @@ export default class LifeCycle<Props extends Record<string, unknown>> {
       }),
     );
     htmlTagFragment.appendChild(contentWrapper);
-    this.htmlTagFragment = htmlTagFragment;
-    this.contentWrapper = contentWrapper;
+    return {
+      htmlTagFragment,
+      contentWrapper,
+    };
   };
 
   private defineCustomElement = (): Promise<void> => {
@@ -119,11 +124,14 @@ export default class LifeCycle<Props extends Record<string, unknown>> {
     return this.hooks.beforeElementDefinition.call(this).then(this.componentBuilder);
   };
 
-  private generateCustomElement = (): typeof CustomElementType => {
+  private generateCustomElement = () => {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const { options, contentWrapper, htmlTagFragment, module } = this;
+    const { options, module, buildFragment } = this;
     return class CustomElement extends CustomElementType {
       public attributesObj: Props = {} as Props;
+      public webComponentsIns: ShadowRoot | HTMLElement;
+      public contentWrapper: HTMLElement;
+      public htmlTagFragment: DocumentFragment;
       // for attributeChangedCallback
       static get observedAttributes() {
         return Object.keys(options.propTypes || {});
@@ -131,21 +139,20 @@ export default class LifeCycle<Props extends Record<string, unknown>> {
 
       constructor() {
         super();
-        if (options.shadow) {
-          this.shadow = this.attachShadow({ mode: 'open' });
-          this.shadow.appendChild(htmlTagFragment);
-        } else {
-          this.appendChild(htmlTagFragment);
-        }
-        module.bootstrap && module.bootstrap();
+        this.webComponentsIns = options.shadow ? this.attachShadow({ mode: 'open' }) : this;
+        module.bootstrap && module.bootstrap(this);
       }
 
       connectedCallback() {
-        module.mount(contentWrapper, this.attributesObj);
+        const { contentWrapper, htmlTagFragment } = buildFragment();
+        this.contentWrapper = contentWrapper;
+        this.htmlTagFragment = htmlTagFragment;
+        this.webComponentsIns.appendChild(this.htmlTagFragment);
+        module.mount(this.contentWrapper, this.attributesObj, this);
       }
 
       disconnectedCallback() {
-        module.unmount && module.unmount();
+        module.unmount && module.unmount(this);
       }
 
       attributeChangedCallback(attributeName: keyof Props, _oldValue: string, newValue: string) {
@@ -153,12 +160,15 @@ export default class LifeCycle<Props extends Record<string, unknown>> {
           ...this.attributesObj,
         };
         const propsValue = heap.getPropsValue<Props>(attributeName, newValue, options.propTypes);
+        const prevValue = this.attributesObj[attributeName];
         this.attributesObj[attributeName] = propsValue;
         (attributeName in oldAttributesObj ? module.updated : module.firstUpdated)?.(
           attributeName,
           propsValue,
-          contentWrapper,
+          this.contentWrapper,
           this.attributesObj,
+          this,
+          prevValue,
         );
       }
     };
