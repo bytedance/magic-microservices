@@ -109,6 +109,7 @@ export default class LifeCycle<Props extends {} = Record<string, unknown>> {
     const contentWrapper = renderHtmlTagObjectToHtmlElement(
       createHtmlTagObject('div', {
         id: 'magic-wrapper',
+        style: 'height: 100%; width: 100%;',
       }),
     );
     htmlTagFragment.appendChild(contentWrapper);
