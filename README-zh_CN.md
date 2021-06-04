@@ -1,10 +1,18 @@
-# Magic Microservices
+<p align="center">
+    <img width="300" src="https://lf3-static.bytednsdoc.com/obj/eden-cn/lpqulynulog/magic/logo.qW4rU0mH6aL8.svg">
+</p>
+
+<h1 align="center">Magic Microservices</h1>
+
+<div align="center">
 
 让前端的一切皆可“微”（一个函数解决微前端）
 
-[![Build Status](https://www.travis-ci.org/bytedance/magic-microservices.svg?branch=main)](https://www.travis-ci.org/bytedance/magic-microservices) [![codecov](https://codecov.io/gh/bytedance/magic-microservices/branch/main/graph/badge.svg?token=FmpE8fWxEu)](https://codecov.io/gh/bytedance/magic-microservices) [![npm](https://img.shields.io/npm/v/@magic-microservices/magic)](https://www.npmjs.com/package/@magic-microservices/magic)  [![GitHub](https://img.shields.io/github/license/bytedance/magic-microservices?color=blue)](https://github.com/bytedance/magic-microservices/blob/main/LICENSE)  
+[![Build Status](https://www.travis-ci.org/bytedance/magic-microservices.svg?branch=main)](https://www.travis-ci.org/bytedance/magic-microservices) [![codecov](https://codecov.io/gh/bytedance/magic-microservices/branch/main/graph/badge.svg?token=FmpE8fWxEu)](https://codecov.io/gh/bytedance/magic-microservices) [![npm](https://img.shields.io/npm/v/@magic-microservices/magic)](https://www.npmjs.com/package/@magic-microservices/magic) [![GitHub](https://img.shields.io/github/license/bytedance/magic-microservices?color=blue)](https://github.com/bytedance/magic-microservices/blob/main/LICENSE)
 
 [English](./README.md) | 简体中文
+
+</div>
 
 ## 概述
 
@@ -376,12 +384,7 @@ ReactDOM.render(
 
 ```javascript
 ReactDOM.render(
-    <custom-component
-        id="123"
-        test
-        count={count}
-        callback={useProps(() => 'test')}
-    ></custom-component>,
-    MOUNT_NODE,
-)
+  <custom-component id="123" test count={count} callback={useProps(() => 'test')}></custom-component>,
+  MOUNT_NODE,
+);
 ```
