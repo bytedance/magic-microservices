@@ -152,7 +152,7 @@ export default class LifeCycle<Props extends {} = Record<string, unknown>> {
       }
 
       disconnectedCallback() {
-        module.unmount && module.unmount(this);
+        module.unmount && module.unmount(this, this.contentWrapper);
       }
 
       attributeChangedCallback(attributeName: keyof Props, _oldValue: string, newValue: string) {

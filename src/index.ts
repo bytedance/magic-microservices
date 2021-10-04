@@ -32,7 +32,7 @@ export interface Module<Props extends {} = Record<string, unknown>> {
     magicInstance: MagicInstanceType<Props>,
     prevValue: ValueOf<Props>,
   ) => void;
-  unmount?: (magicInstance: MagicInstanceType<Props>) => void;
+  unmount?: (magicInstance: MagicInstanceType<Props>, container: Element) => void;
 }
 
 export type ModuleType<Props extends {} = Record<string, unknown>> =
