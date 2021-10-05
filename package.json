@@ -57,7 +57,7 @@
     "build:browser:prod": "cross-env TARGET=web-esm-browser-prod rollup -c build/config.js",
     "build:umd:prod": "cross-env TARGET=web-umd-prod rollup -c build/config.js",
     "build:system:prod": "cross-env TARGET=web-system-prod rollup -c build/config.js",
-    "build": "rm -rf dist && npm-run-all --parallel check-types build:*:*"
+    "build": "rmiraf dist && npm-run-all --parallel check-types build:*:*"
   },
   "husky": {
     "hooks": {
@@ -106,6 +106,7 @@
     "lint-staged": "^10.2.11",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.0.5",
+    "rimraf": "^3.0.2",
     "rollup": "^2.7.6",
     "rollup-plugin-external-globals": "^0.5.0",
     "rollup-plugin-terser": "^6.1.0",
