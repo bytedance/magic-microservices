@@ -57,7 +57,7 @@ class Heap {
     } else if (propTypes[name] === Number) {
       return (Number(value) as unknown) as ValueOf<Props>;
     }
-    if (this.dataMap[value]) {
+    if (Object.prototype.hasOwnProperty.call(this.dataMap, value)) {
       // 放在堆中的引用类型数据
       const heapValue = this.dataMap[value];
       // 取出即回收
