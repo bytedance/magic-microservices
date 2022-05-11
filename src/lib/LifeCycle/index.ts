@@ -4,6 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
+import retargetEvents from 'react-shadow-dom-retarget-events';
 import functionExecutor from '@/utils/functionExecutor';
 import {
   createHtmlTagObject,
@@ -139,7 +140,16 @@ export default class LifeCycle<Props extends {} = Record<string, unknown>> {
 
       constructor() {
         super();
-        this.webComponentsIns = options.shadow ? this.attachShadow({ mode: 'open' }) : this;
+        this.webComponentsIns = this;
+        if (options.shadow) {
+          this.webComponentsIns = this.attachShadow({ mode: 'open' });
+
+          /**
+           * 兼容 React17 之前 SyntheticEvent 合成事件机制
+           * https://github.com/facebook/react/issues/10422
+           */
+          retargetEvents(this.webComponentsIns);
+        }
         module.bootstrap && module.bootstrap(this);
       }
 
