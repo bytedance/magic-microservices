@@ -4,8 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import magic, { useProps, isModuleRegistered, MagicInstanceType } from '@/index';
-import LifeCycle from '@/lib/LifeCycle';
+import magic, { useProps, isModuleRegistered, MagicInstanceType, LifeCycle } from '@/index';
 
 const componentTag = 'my-component';
 const shadowComponentTag = 'my-component-shadow';
@@ -168,25 +167,41 @@ describe('test magic', () => {
   });
 
   test('test plugins', (done) => {
-    interface testLifeCycleType extends LifeCycle<Record<string, unknown>> {
-      test: number;
-    }
+    type testLifeCycle = LifeCycle & { test: number };
+    type testMagicInstanceType = MagicInstanceType & { test: number };
     const test = 1;
     class MagicPlugin {
-      apply(lifeCycle: LifeCycle<Record<string, unknown>>) {
-        lifeCycle.hooks.beforeOptionsInit.tap((lifeCycle: testLifeCycleType) => {
+      apply(lifeCycle: LifeCycle) {
+        lifeCycle.hooks.beforeOptionsInit.tap((lifeCycle: testLifeCycle) => {
           expect(lifeCycle.test).toBeUndefined();
         });
         lifeCycle.hooks.alterHTMLTags.tap([
-          (lifeCycle: testLifeCycleType) => {
+          (lifeCycle: testLifeCycle) => {
             lifeCycle.test = test;
           },
-          (lifeCycle: testLifeCycleType) => {
+          (lifeCycle: testLifeCycle) => {
             expect(lifeCycle.test).toBe(test);
           },
         ]);
-        lifeCycle.hooks.beforeElementDefinition.tap((lifeCycle: testLifeCycleType) => {
+        lifeCycle.hooks.beforeElementDefinition.tap((lifeCycle: testLifeCycle) => {
           expect(lifeCycle.test).toBe(test);
+        });
+        lifeCycle.hooks.boforeBootstrap.tap((magicInstance: testMagicInstanceType) => {
+          expect(magicInstance.test).toBeUndefined();
+        });
+        lifeCycle.hooks.beforeMount.tap([
+          (magicInstance: testMagicInstanceType) => {
+            magicInstance.test = test;
+          },
+          (magicInstance: testMagicInstanceType) => {
+            expect(magicInstance.test).toBe(test);
+          },
+        ]);
+        lifeCycle.hooks.beforeUpdated.tap((magicInstance: testMagicInstanceType) => {
+          expect(magicInstance.test).toBe(test);
+        });
+        lifeCycle.hooks.boforeUnmount.tap((magicInstance: testMagicInstanceType) => {
+          expect(magicInstance.test).toBe(test);
           done();
         });
       }
