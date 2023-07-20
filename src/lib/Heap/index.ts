@@ -50,7 +50,9 @@ class Heap {
     propTypes: PropTypesMap<Props> = {} as PropTypesMap<Props>,
   ): ValueOf<Props> => {
     if (propTypes[name] === Boolean) {
-      if (value === 'false') {
+      // 对于布尔属性有特殊处理，赋值 true 会设置属性存在, 赋值 false 会移除属性
+      // 此时 value 为 null
+      if (value == 'false') {
         return (false as unknown) as ValueOf<Props>;
       }
       return (true as unknown) as ValueOf<Props>;
